@@ -53,7 +53,9 @@
 
         do i=0, JJ
            x(i)= 0 + i*dx
-           g(0,i) = 1
+           do n = 0,NN
+           g(n,i) = 1
+           end do     
         end do
         
 
