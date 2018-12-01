@@ -15,7 +15,7 @@
         
         integer, parameter :: JJ = 20  !distance steps  (Valor a definir)
         integer, parameter :: NN = 20  !time steps (Valor a definir)
-        integer, parameter :: dx = 0.1 !m
+        real, parameter :: dx = 0.1 !m
         real, parameter :: Ttot = 200! Valor a definir
         real, parameter :: PI = 3.14159265359
         real, parameter :: grav = 9.80665  !m/s²
