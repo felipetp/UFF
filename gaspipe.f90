@@ -82,7 +82,7 @@
         g(n+1,j)= g_novo(j)
         end do        
         
-        open(10,file='crank_nicolsan.txt')
+        open(10,file='crank_nicolsan.txt',status='REPLACE')
         write(10,*)  'ApproximateSolution =[',x(0),g(0,0)
         do j =0, JJ
           do n= 0, NN
@@ -128,3 +128,4 @@
 
 
         
+
