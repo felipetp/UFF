@@ -51,10 +51,11 @@
         !CONDIÇÃO INICIAL!
         !!!!!!!!!!!!!!!!!!
 
-        do i=1,19
+        do i=2, n-1
         p(i) = 1
         end do
        
+        do i=2, n-1
         x(i) = 0 + (i)*dx
         p(i) = 
         end do
