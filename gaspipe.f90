@@ -13,19 +13,19 @@
         !PARÂMETROS!
         !!!!!!!!!!!!
         
-        integer, parameter :: JJ = 20  !distance steps  (Valor a definir)
+        integer, parameter :: JJ = 1000  !distance steps  (Valor a definir)
         integer, parameter :: NN = 20  !time steps (Valor a definir)
         real, parameter :: dx = 0.1 !m
         real, parameter :: Ttot = 200! Valor a definir
         real, parameter :: PI = 3.14159265359
-        real, parameter :: grav = 9.80665  !m/s²
-        real, parameter :: D = 0.07  !m A definir
-        real, parameter :: f = 0.002  ! pq?
-        real, parameter :: ro = 1.184 !kg/m³  (temp. 25º)
+        real, parameter :: grav = 0.6  !m/s²
+        real, parameter :: D = 0.6  !m A definir
+        real, parameter :: f = 0.003  ! pq?
+        real, parameter :: ro = 0.73 !kg/m³  (temp. 25º)
         real, parameter :: c = 340.29 !m/s  (temp. 25º)
         real, parameter :: teta = 0 !tubulação horizontal
-        real, parameter :: Q = 1 !m3/s
-        real, parameter :: p0 = 700000.0 
+        real, parameter :: Q = 60 !m3/s
+        real, parameter :: p0 = 5000000.0 
 
         
         !!!!!!!!!!!
