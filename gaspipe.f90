@@ -87,15 +87,15 @@
         
         !GRAVANDO OS RESULTADOS
         
-        open(10,file='crank_nicolsan.txt',status='REPLACE')
-        write(10,*)  'ApproximateSolution =[',x(0),g(0,0)
-        do j =0, JJ
-           do n= 0, NN
-                write(10,*) j, n, x(j),g(n,j)
-           end do
-         end do
+        !open(10,file='crank_nicolsan.txt',status='REPLACE')
+        !write(10,*)  'ApproximateSolution =[',x(0),g(0,0)
+        !do j =0, JJ
+        !   do n= 0, NN
+        !        write(10,*) j, n, x(j),g(n,j)
+        !   end do
+        ! end do
          
-        close(10)
+        !close(10)
         end program ferramentasmatematicas 
 
         
@@ -122,6 +122,7 @@
             q = asup(j)/aprin(j-1)
               aprin(j) = aprin(j)-q*ainf(j-1)
               bcol(j) = bcol(j)-q*bcol(j-1)
+                print *, q, aprin(j), bcol(j)
            end do 
  
         !back substitution
