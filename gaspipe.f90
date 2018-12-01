@@ -25,7 +25,7 @@
         real, parameter :: c = 340.29 !m/s  (temp. 25º)
         real, parameter :: teta = 0 !tubulação horizontal
         real, parameter :: Q = 16 !m3/s
-        real, parameter :: p0 = 7.0 !m3/s
+        real, parameter :: p0 = 700000.0 
 
         
         !!!!!!!!!!!
