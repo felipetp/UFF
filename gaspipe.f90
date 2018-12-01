@@ -47,6 +47,7 @@
         b = a*beta*dx/2.0
         zeta = (f/D)*((2.0*ro*c*Q/S)**2.0)
         
+        print *, a, b , zeta
         !!!!!!!!!!!!!!!!!!
         !CONDIÇÃO INICIAL!
         !!!!!!!!!!!!!!!!!!
@@ -79,6 +80,7 @@
                 aprin(j) = -2.0-2.0*a
                 ainf(j) = (a+b)
                 bcol(j) = (-a-b)*g(n,j+1)+(2.0-2.0*a)*g(n,j)+(-a+b)*g(n,j-1)  
+                print *, asup(j), aprin(j), ainf(j), bcol(j)
         end do  
    
         call thomas_algorithm(asup,aprin,ainf,bcol,JJ,g_novo)     
@@ -122,7 +124,6 @@
             q = asup(j)/aprin(j-1)
               aprin(j) = aprin(j)-q*ainf(j-1)
               bcol(j) = bcol(j)-q*bcol(j-1)
-                print *, q, aprin(j), bcol(j)
            end do 
  
         !back substitution
