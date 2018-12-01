@@ -33,7 +33,7 @@
         real, allocatable :: x(:),g(:,:),asup(:),aprin(:),ainf(:),bcol(:),g_novo(:)
         real :: p0, pL, L, zeta, S, a, b, dt
         real :: beta, alfa 
-        integer :: i,j
+        integer :: i,j, N
         allocate (x(0:JJ), g(0:NN+1,0:JJ),asup(0:JJ),aprin(0:JJ),ainf(0:JJ),bcol(0:JJ),g_novo(0:JJ))
 
         
@@ -55,6 +55,11 @@
            x(i)= 0 + i*dx
            g(0,i) = 1
         end do
+        
+        do i=0, JJ
+                print*,  x(i)
+        end do
+        
         
         !!!!!!!!!!!!!!!!!!!!!!!
         !CONDIÇÕES DE CONTORNO!
@@ -88,11 +93,11 @@
         write(10,*)  'ApproximateSolution =[',x(0),g(0,0)
         do j =0, JJ
            do n= 0, NN
-                write(10,*) j,',' n,'    ',  x(j),g(n,j)
+                write(10,*) j, n, x(j),g(n,j)
            end do
          end do
-                  write(10,*) JJ,NN, x(JJ),g(NN,JJ),']'
-         close(10)
+         
+        close(10)
         end program ferramentasmatematicas 
 
         
