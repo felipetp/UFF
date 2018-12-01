@@ -15,8 +15,8 @@
         
         integer, parameter :: JJ = 20  !distance steps  (Valor a definir)
         integer, parameter :: NN = 20  !time steps (Valor a definir)
-        integer, parameter :: dx =  ! Valor a definir
-        real, parameter :: Ttot = ! Valor a definir
+        integer, parameter :: dx = 0.1 !m
+        real, parameter :: Ttot = 200! Valor a definir
         real, parameter :: PI = 3.14159265359
         real, parameter :: g = 9.80665  !m/s²
         real, parameter :: D = 0.07  !m A definir
@@ -30,11 +30,12 @@
         !!!!!!!!!!!
         !VÁRIAVEIS!
         !!!!!!!!!!!
-        
+        real, allocatable :: x(:),g(:,:),asup(:),aprin(:),ainf(:),bcol(:),g_novo(:)
         real :: p0, pL, L, zeta, S, a, b, dt
-        real :: beta, alfa, dx, 
+        real :: beta, alfa 
         integer :: i,j, N, M
-        real, dimension :: x(0:JJ),g(0:NN+1,0:JJ),asup(0:JJ),aprin(0:JJ),ainf(0:JJ), bcol(0:JJ),g_novo(0:JJ)
+        allocate (x(0:JJ), g(0:NN+1,0:JJ),asup(0:JJ),aprin(0:JJ),ainf(0:JJ),bcol(0:JJ),g_novo(0:JJ))
+
         
         
         dt = Ttot/N
@@ -70,54 +71,54 @@
         
         do n = 0 , NN !loop
         do j = 1, JJ-1  ! a,b,c are the coefficients of C-N scheme and d is the right part
-                a(j) = (a-b)
-                b(j) = -2.0-2.0*a
-                c(j) = (a+b)
-                d(j) = (-a-b)*g(n,j+1)+(2.0-2.0*a)*g(n,j)+(-a+b)*g(n,j-1)  
+                asup(j) = (a-b)
+                aprin(j) = -2.0-2.0*a
+                ainf(j) = (a+b)
+                bcol(j) = (-a-b)*g(n,j+1)+(2.0-2.0*a)*g(n,j)+(-a+b)*g(n,j-1)  
         end do  
    
-        call thomas_algorithm(a,b,c,d,JJ,g_novo)     
+        call thomas_algorithm(asup,aprin,ainf,bcol,JJ,g_novo)     
         g(n+1,j)= g_novo(j)
         end do        
         
         open(10,file='crank_nicolsan.txt')
-        write(10,*)  'ApproximateSolution =[',x(0),u(0,0)
-        do j =0, JI
-          do n= 0, NI
-        write(10,*) x(j),u(n,j)
+        write(10,*)  'ApproximateSolution =[',x(0),g(0,0)
+        do j =0, JJ
+          do n= 0, NN
+        write(10,*) x(j),g(n,j)
          end do
          end do
-        write(10,*)x(JI),u(NI,JI),']'
+        write(10,*)x(JJ),g(NN,JJ),']'
          close(10)
         end program ferramentasmatematicas 
 
-        subroutine thomas_algorithm(a,b,c,d,JJ,g_novo)
+        subroutine thomas_algorithm(asup,aprin,ainf,bcol,JJ,g_novo))
  
-!	 a - sub-diagonal (means it is the diagonal below the main diagonal)
-!	 b - the main diagonal
-!	 c - sup-diagonal (means it is the diagonal above the main diagonal)
-!	 d - right part
-!	 u_new - the answer
+!	 asup - sub-diagonal (means it is the diagonal below the main diagonal)
+!	 aprin - the main diagonal
+!	 ainf - sup-diagonal (means it is the diagonal above the main diagonal)
+!	 bcol - right part
+!	 g_novo - the answer
 
         implicit none
         integer,intent(in) :: JJ
-        real,intent(in) :: a(JJ),c(JJ)
-        real,intent(inout),dimension(JJ) :: b,d
+        real,intent(in) :: asup(JJ),ainf(JJ)
+        real,intent(inout),dimension(JJ) :: aprin,bcol
         real,intent(out) :: g_novo(JJ)
         integer j
         real ::q
  
         do j = 2,JJ                 !combined decomposition and forward substitution
-            q = a(j)/b(j-1)
-              b(j) = b(j)-q*c(j-1)
-              d(j) = d(j)-q*d(j-1)
+            q = asup(j)/aprin(j-1)
+              aprin(j) = aprin(j)-q*ainf(j-1)
+              bcol(j) = bcol(j)-q*bcol(j-1)
            end do 
  
         !back substitution
-           q = d(JJ)/b(JJ)
+           q = bcol(JJ)/aprin(JJ)
            g_novo(JJ)=q
            do j = JJ-1,1,-1
-              q = (d(j)-c(j)*d(j+1))/b(j)
+              q = (bcol(j)-ainf(j)*bcol(j+1))/aprin(j)
              g_novo(j)=q
            end do
           RETURN
