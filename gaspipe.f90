@@ -25,18 +25,18 @@
         real, parameter :: c = 340.29 !m/s  (temp. 25º)
         real, parameter :: teta = 0 !tubulação horizontal
         real, parameter :: Q = 16 !m3/s
+        real, parameter :: p0 = 7.0 !m3/s
 
         
         !!!!!!!!!!!
         !VÁRIAVEIS!
         !!!!!!!!!!!
         real, allocatable :: x(:),g(:,:),asup(:),aprin(:),ainf(:),bcol(:),g_novo(:)
-        real :: p0, pL, L, zeta, S, a, b, dt
+        real :: zeta, S, a, b, dt
         real :: beta, alfa 
         integer :: i,j, N
         allocate (x(0:JJ), g(0:NN+1,0:JJ),asup(0:JJ),aprin(0:JJ),ainf(0:JJ),bcol(0:JJ),g_novo(0:JJ))
 
-        
         
         dt = Ttot/N
         S = PI*((d/2.0)**2)
@@ -56,18 +56,14 @@
            g(0,i) = 1
         end do
         
-        do i=0, JJ
-                print*,  x(i)
-        end do
-        
-        
+
         !!!!!!!!!!!!!!!!!!!!!!!
         !CONDIÇÕES DE CONTORNO!
         !!!!!!!!!!!!!!!!!!!!!!!
 
         do n=0, NN
            g(n,0)=7 !pressão constante na saída do compressor
-           g(n,JJ)= SQRT((p0)**2.0-(zeta*L)) !assumimos que o último elemento discreto é regime permanente.
+           g(n,JJ)= SQRT((p0)**2.0-(zeta*JJ)) !assumimos que o último elemento discreto é regime permanente.
         end do
 
        
