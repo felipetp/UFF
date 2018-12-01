@@ -18,7 +18,7 @@
         integer, parameter :: dx = 0.1 !m
         real, parameter :: Ttot = 200! Valor a definir
         real, parameter :: PI = 3.14159265359
-        real, parameter :: g = 9.80665  !m/s²
+        real, parameter :: grav = 9.80665  !m/s²
         real, parameter :: D = 0.07  !m A definir
         real, parameter :: f = 0.002  ! pq?
         real, parameter :: ro = 1.184 !kg/m³  (temp. 25º)
@@ -41,7 +41,7 @@
         dt = Ttot/N
         S = PI*((d/2.0)**2)
         alfa = (16.0*f*Q)/((D**3.0)*(c**2.0)*PI)
-        beta = (2.0*g*sin(teta))/(c**2.0)
+        beta = (2.0*grav*sin(teta))/(c**2.0)
 
         a = dt/alfa*(dx)**2.0
         b = a*beta*dx/2.0
@@ -93,7 +93,7 @@
          close(10)
         end program ferramentasmatematicas 
 
-        subroutine thomas_algorithm(asup,aprin,ainf,bcol,JJ,g_novo))
+        subroutine thomas_algorithm(asup,aprin,ainf,bcol,JJ,g_novo)
  
 !	 asup - sub-diagonal (means it is the diagonal below the main diagonal)
 !	 aprin - the main diagonal
