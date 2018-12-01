@@ -72,15 +72,15 @@
 
         !diagonal principal
         do i = 1,n
-          A(i,i) = (-2a - 2.0)
+          A(i,i) = (-2.0*a - 2.0)
         end do
 
-        !diagonal superior
+        !diagonal inferior
         do i = 2,n
           A(i,i-1) = (a - b)
         end do
 
-        !diagonal inferior
+        !diagonal superior
         do i = 2, n
            A(i-1,i) = (a + b)
         end do
@@ -98,15 +98,15 @@
 
         !diagonal principal
         do i = 1,n
-          B(i,i) = (2a - 2.0)
+          B(i,i) = (2.0*a - 2.0)
         end do
 
-        !diagonal superior
+        !diagonal inferior
         do i = 2,n
           B(i,i-1) = (-a + b)
         end do
 
-        !diagonal inferior
+        !diagonal superior
         do i = 2, n
            B(i-1,i) = (-a - b)
         end do
