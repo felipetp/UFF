@@ -33,7 +33,7 @@
         real, allocatable :: x(:),g(:,:),asup(:),aprin(:),ainf(:),bcol(:),g_novo(:)
         real :: p0, pL, L, zeta, S, a, b, dt
         real :: beta, alfa 
-        integer :: i,j, N, M
+        integer :: i,j
         allocate (x(0:JJ), g(0:NN+1,0:JJ),asup(0:JJ),aprin(0:JJ),ainf(0:JJ),bcol(0:JJ),g_novo(0:JJ))
 
         
@@ -52,7 +52,7 @@
         !!!!!!!!!!!!!!!!!!
 
         do i=0, JJ
-           x(i)= 0+i*dx
+           x(i)= 0 + i*dx
            g(0,i) = 1
         end do
         
@@ -82,16 +82,22 @@
         g(n+1,j)= g_novo(j)
         end do        
         
+        !GRAVANDO OS RESULTADOS
+        
         open(10,file='crank_nicolsan.txt',status='REPLACE')
         write(10,*)  'ApproximateSolution =[',x(0),g(0,0)
         do j =0, JJ
-          do n= 0, NN
-        write(10,*) x(j),g(n,j)
+           do n= 0, NN
+                write(10,*) j,',' n,'    ',  x(j),g(n,j)
+           end do
          end do
-         end do
-        write(10,*)x(JJ),g(NN,JJ),']'
+                  write(10,*) JJ,NN, x(JJ),g(NN,JJ),']'
          close(10)
         end program ferramentasmatematicas 
+
+        
+        
+        !SUBROTINA METODO DE THOMAS BOLADO
 
         subroutine thomas_algorithm(asup,aprin,ainf,bcol,JJ,g_novo)
  
