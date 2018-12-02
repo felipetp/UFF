@@ -1,0 +1,115 @@
+program HW36u
+implicit none
+integer, parameter:: mag = 21
+real , dimension(mag) :: u , uold , x , d , b , dprime
+real , dimension(2:mag) :: a
+real , dimension(mag-1) :: cprime , c
+real , dimension( mag , mag ) :: K
+real :: t , dt , dx , r , u0 , u20
+integer :: j , i , n , m
+write (*,*)'type your desirable time'
+read (*,*) t
+write (*,*)'type your desirable time step'
+read (*,*) dt
+n = t / dt
+dx = 1. / (mag-1)
+r = dt / (dx**2)
+u0 = 0 !boundary condition
+
+!Initial Condition
+do i=1,mag
+x(i) = 0 + (i-1)*dx
+if ( x(i) < 0.75 ) then
+u(i)= 0
+else if ( x(i) > 0.75 ) then
+u(i) = 1
+else
+u(i)= 0.5
+end if
+end do
+
+!! Build coefficient matrix for steady state solution
+!constructing the diagonals of the coeficents matrix A
+do i=1,mag
+b(i) = 2*r
+end do
+b(mag) = r
+do i=1,mag-1
+c(i) = -r
+end do
+c(1) = 0
+do i=2,mag
+a(i) = -r
+end do
+!constructing the coeficents of knwon u, matrix K
+do i=1,mag
+do j=1,mag
+if ( i == j ) then
+K(i,j) = -b(i)
+else if ( j-i == 1) then
+K(i,j) = -c(i)
+else if ( i-j == 1 ) then
+K(i,j) = -a(i)
+else
+K(i,j) = 0
+end if
+end do
+end do
+
+!! Now add transient term on both sides
+do i=1,mag
+b(i) = b(i) + 2
+K(i,i) = K(i,i) + 2
+end do
+
+!computing the value of heat eq. for the desired time
+
+!Thomas Algorithm
+do m = 1,n
+
+uold = u
+
+!constructing the knwon matrix d
+d = matmul (K , uold)
+
+!constructing c'
+do i=1,mag-1
+if (i==1) then
+cprime(i) = c(i) / b(i)
+else
+cprime(i) = c(i) / ( b(i) - cprime(i-1)*a(i) )
+end if
+end do
+
+!constructing d'
+do i=1,mag
+if (i==1) then
+dprime(i) = d(i) / b(i)
+else
+dprime(i) = ( d(i) - dprime(i-1)*a(i) ) / ( b(i) - cprime(i-1)*a(i) )
+end if
+end do
+
+!calculating u
+do i=mag,1,-1
+if ( i == mag ) then
+u(i) = dprime(i)
+else
+u(i) = dprime(i) - ( cprime(i)*u(i+1) )
+end if
+end do
+end do
+
+
+!output on screen
+write (*,*) 'The data will be outputed to a file'
+
+!output data to a file
+open (1, file='hw3-6.txt')
+do i=1,mag
+write(1,100) x(i), ' ', u(i)
+end do
+100 format (F6.3,A3,F6.3)
+close(1)
+
+end program HW36u
