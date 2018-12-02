@@ -26,7 +26,7 @@
         double precision, parameter :: c = 340.29 !m/s  (temp. 25º)
         double precision, parameter :: teta = 0 !tubulação horizontal
         double precision, parameter :: Q = 10 !m3/s
-        double precision, parameter :: p0 = 7000000.0 
+        double precision, parameter :: Po = 7000000.0 
 
         
         !!!!!!!!!!!
@@ -68,11 +68,11 @@
         !!!!!!!!!!!!!!!!!!!!!!!
 
         do n=0, NN
-           g(n,0)=7 !pressão constante na saída do compressor
+           g(n,0)= Po !pressão constante na saída do compressor
            enddo
 
            do n=0, NN  
-           g(n,JJ)= SQRT((p0)**2.0-(zeta*JJ)) !assumimos que o último elemento discreto é regime permanente.
+           g(n,JJ)= SQRT((Po)**2.0-(zeta*JJ)) !assumimos que o último elemento discreto é regime permanente.
         end do
 
        
