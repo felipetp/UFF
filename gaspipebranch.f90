@@ -14,7 +14,7 @@
         !PARÂMETROS!
         !!!!!!!!!!!!
         
-        integer, parameter :: JJ = 10  !distance steps  (Valor a definir)
+        integer, parameter :: JJ = 100000  !distance steps  (Valor a definir)
         integer, parameter :: NN = 20  !time steps (Valor a definir)
         double precision, parameter :: dx = 0.1 !m
         double precision, parameter :: Ttot = 200! Valor a definir
@@ -25,8 +25,8 @@
         double precision, parameter :: ro = 0.73 !kg/m³  (temp. 25º)
         double precision, parameter :: c = 340.29 !m/s  (temp. 25º)
         double precision, parameter :: teta = 0 !tubulação horizontal
-        double precision, parameter :: Q = 60 !m3/s
-        double precision, parameter :: p0 = 5000000.0 
+        double precision, parameter :: Q = 10 !m3/s
+        double precision, parameter :: p0 = 7000000.0 
 
         
         !!!!!!!!!!!
