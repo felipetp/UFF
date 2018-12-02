@@ -3,7 +3,8 @@
         
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         !                                            !
-        !    PEDRO LINS DE MOURA MARTINS DA COSTA    !
+        !     FELIPE FERNANDES TEPEDINO              !
+        !     PEDRO LINS DE MOURA MARTINS DA COSTA   !
         !                                            !
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         
@@ -32,8 +33,8 @@
         !VÁRIAVEIS!
         !!!!!!!!!!!
         real, allocatable :: x(:),g(:,:),asup(:),aprin(:),ainf(:),bcol(:),g_novo(:)
-        real :: zeta, S, a, b, dt
-        real :: beta, alfa 
+        double precision :: zeta, S, a, b, dt
+        double precision :: beta, alfa 
         integer :: i,j, N
         allocate (x(0:JJ), g(0:NN+1,0:JJ),asup(0:JJ),aprin(0:JJ),ainf(0:JJ),bcol(0:JJ),g_novo(0:JJ))
 
