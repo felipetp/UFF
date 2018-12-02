@@ -67,7 +67,7 @@
 
         do n=0, NN
            g(n,0)=7 !pressão constante na saída do compressor
-           g(n,JJ)= SQRT((p0)**2.0-(zeta*JJ)) !assumimos que o último elemento discreto é regime permanente.
+           g(n,JJ)= SQRT(((p0)**2.0)-(zeta*JJ)) !assumimos que o último elemento discreto é regime permanente.
         end do
 
        
