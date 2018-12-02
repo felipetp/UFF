@@ -80,11 +80,11 @@
                 asup(j) = (a-b)
                 aprin(j) = -2.0-2.0*a
                 ainf(j) = (a+b)
-                bcol(j) = (-a-b)*g(n,j+1)+(2.0-2.0*a)*g(n,j)+(-a+b)*g(n,j-1)  
+                bcol(j) = (-a-b)*g(n,j+1)+(2.0+2.0*a)*g(n,j)+(-a+b)*g(n,j-1)  
                 print *, asup(j), aprin(j), ainf(j), bcol(j)
         end do  
    
-        call thomas_algorithm(asup,aprin,ainf,bcol,JJ,g_novo)     
+        call thomas_algorithm(ainf,aprin,asup,bcol,JJ,g_novo)     
         g(n+1,j)= g_novo(j)
         end do        
         
@@ -105,7 +105,7 @@
         
         !SUBROTINA METODO DE THOMAS BOLADO
 
-        subroutine thomas_algorithm(asup,aprin,ainf,bcol,JJ,g_novo)
+        subroutine thomas_algorithm(ainf,aprin,asup,bcol,JJ,g_novo)
  
 !	 asup - sub-diagonal (means it is the diagonal below the main diagonal)
 !	 aprin - the main diagonal
@@ -122,8 +122,8 @@
         real ::q
  
         do j = 2,JJ                 !combined decomposition and forward substitution
-            q = asup(j)/aprin(j-1)
-              aprin(j) = aprin(j)-q*ainf(j-1)
+            q = ainf(j)/aprin(j-1)
+              aprin(j) = aprin(j)-q*asup(j-1)
               bcol(j) = bcol(j)-q*bcol(j-1)
            end do 
  
@@ -131,7 +131,7 @@
            q = bcol(JJ)/aprin(JJ)
            g_novo(JJ)=q
            do j = JJ-1,1,-1
-              q = (bcol(j)-ainf(j)*bcol(j+1))/aprin(j)
+              q = (bcol(j)-asup(j)*bcol(j+1))/aprin(j)
              g_novo(j)=q
            end do
           RETURN
