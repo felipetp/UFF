@@ -14,7 +14,7 @@
         !PARÂMETROS!
         !!!!!!!!!!!!
         
-        integer, parameter :: JJ = 1000  !distance steps  (Valor a definir)
+        integer, parameter :: JJ = 100000  !distance steps  (Valor a definir)
         integer, parameter :: NN = 20  !time steps (Valor a definir)
         real, parameter :: dx = 0.1 !m
         real, parameter :: Ttot = 200! Valor a definir
@@ -25,8 +25,8 @@
         real, parameter :: ro = 0.73 !kg/m³  (temp. 25º)
         real, parameter :: c = 340.29 !m/s  (temp. 25º)
         real, parameter :: teta = 0 !tubulação horizontal
-        real, parameter :: Q = 60 !m3/s
-        real, parameter :: p0 = 5000000.0 
+        real, parameter :: Q = 10 !m3/s
+        real, parameter :: Po = 7000000.0 
 
         
         !!!!!!!!!!!
@@ -66,8 +66,8 @@
         !!!!!!!!!!!!!!!!!!!!!!!
 
         do n=0, NN
-           g(n,0)=7 !pressão constante na saída do compressor
-           g(n,JJ)= SQRT(((p0)**2.0)-(zeta*JJ)) !assumimos que o último elemento discreto é regime permanente.
+           g(n,0) = Po !pressão constante na saída do compressor
+           g(n,JJ)= SQRT(((Po)**2.0)-(zeta*JJ)) !assumimos que o último elemento discreto é regime permanente.
         end do
 
        
