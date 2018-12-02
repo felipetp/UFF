@@ -1,115 +1,123 @@
-program HW36u
-implicit none
-integer, parameter:: mag = 21
-real , dimension(mag) :: u , uold , x , d , b , dprime
-real , dimension(2:mag) :: a
-real , dimension(mag-1) :: cprime , c
-real , dimension( mag , mag ) :: K
-real :: t , dt , dx , r , u0 , u20
-integer :: j , i , n , m
-write (*,*)'type your desirable time'
-read (*,*) t
-write (*,*)'type your desirable time step'
-read (*,*) dt
-n = t / dt
-dx = 1. / (mag-1)
-r = dt / (dx**2)
-u0 = 0 !boundary condition
+        program ferramentasmatematicas
+        implicit none
 
-!Initial Condition
-do i=1,mag
-x(i) = 0 + (i-1)*dx
-if ( x(i) < 0.75 ) then
-u(i)= 0
-else if ( x(i) > 0.75 ) then
-u(i) = 1
-else
-u(i)= 0.5
-end if
-end do
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        !                                            !
+        !     FELIPE FERNANDES TEPEDINO              !
+        !     PEDRO LINS DE MOURA MARTINS DA COSTA   !
+        !                                            !
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!! Build coefficient matrix for steady state solution
-!constructing the diagonals of the coeficents matrix A
-do i=1,mag
-b(i) = 2*r
-end do
-b(mag) = r
-do i=1,mag-1
-c(i) = -r
-end do
-c(1) = 0
-do i=2,mag
-a(i) = -r
-end do
-!constructing the coeficents of knwon u, matrix K
-do i=1,mag
-do j=1,mag
-if ( i == j ) then
-K(i,j) = -b(i)
-else if ( j-i == 1) then
-K(i,j) = -c(i)
-else if ( i-j == 1 ) then
-K(i,j) = -a(i)
-else
-K(i,j) = 0
-end if
-end do
-end do
+        !!!!!!!!!!!!
+        !PARÂMETROS!
+        !!!!!!!!!!!!
 
-!! Now add transient term on both sides
-do i=1,mag
-b(i) = b(i) + 2
-K(i,i) = K(i,i) + 2
-end do
-
-!computing the value of heat eq. for the desired time
-
-!Thomas Algorithm
-do m = 1,n
-
-uold = u
-
-!constructing the knwon matrix d
-d = matmul (K , uold)
-
-!constructing c'
-do i=1,mag-1
-if (i==1) then
-cprime(i) = c(i) / b(i)
-else
-cprime(i) = c(i) / ( b(i) - cprime(i-1)*a(i) )
-end if
-end do
-
-!constructing d'
-do i=1,mag
-if (i==1) then
-dprime(i) = d(i) / b(i)
-else
-dprime(i) = ( d(i) - dprime(i-1)*a(i) ) / ( b(i) - cprime(i-1)*a(i) )
-end if
-end do
-
-!calculating u
-do i=mag,1,-1
-if ( i == mag ) then
-u(i) = dprime(i)
-else
-u(i) = dprime(i) - ( cprime(i)*u(i+1) )
-end if
-end do
-end do
+        integer, parameter :: JJ = 100000  !distance steps  (Valor a definir)
+        integer, parameter :: NN = 20  !time steps (Valor a definir)
+        real, parameter :: dx = 0.1 !m
+        real, parameter :: Ttot = 200! Valor a definir
+        real, parameter :: PI = 3.14159265359
+        real, parameter :: grav = 0.6  !m/s
+        real, parameter :: D = 0.6  !m A definir
+        double precision , parameter :: f = 0.003  ! pq?
+        real, parameter :: ro = 0.73 !kg/m³  (temp. 25º)
+        real, parameter :: c = 340.29 !m/s  (temp. 25º)
+        real, parameter :: teta = 0 !tubulação horizontal
+        real, parameter :: Q = 10 !m3/s
+        real, parameter :: Po = 7000000.0
 
 
-!output on screen
-write (*,*) 'The data will be outputed to a file'
+        !!!!!!!!!!!
+        !VÁRIAVEIS!
+        !!!!!!!!!!!
+        double precision , dimension(JJ) :: x,asup,aprin,ainf,bcol,g_novo
+        double precision , dimension(NN+1,JJ) :: g
+        double precision :: zeta, S, a, b, dt
+        double precision :: w
+        double precision :: beta, alfa
+        integer :: i,j, N
+        !allocate (x(JJ), g(NN+1,JJ),asup(JJ),aprin(JJ),ainf(JJ),bcol(JJ),g_novo(JJ))
 
-!output data to a file
-open (1, file='hw3-6.txt')
-do i=1,mag
-write(1,100) x(i), ' ', u(i)
-end do
-100 format (F6.3,A3,F6.3)
-close(1)
 
-end program HW36u
+        dt = Ttot/N
+        S = PI*((d/2.0)**2)
+        alfa = (16.0*f*Q)/((D**3.0)*(c**2.0)*PI)
+        beta = (2.0*grav*sin(teta))/(c**2.0)
+
+        a = dt/alfa*(dx)**2.0
+        b = a*beta*dx/2.0
+        zeta = (f/D)*((2.0*ro*c*Q/S)**2.0)
+
+        !print *, a, b , zeta
+        !!!!!!!!!!!!!!!!!!
+        !CONDIÇÃO INICIAL!
+        !!!!!!!!!!!!!!!!!!
+
+        do i=1, JJ
+           x(i)= 0 + i*dx
+           do n = 1,NN
+           g(n,i) = 1
+           end do
+        end do
+
+
+        !!!!!!!!!!!!!!!!!!!!!!!
+        !CONDIÇÕES DE CONTORNO!
+        !!!!!!!!!!!!!!!!!!!!!!!
+
+        do n=1, NN
+           g(n,1) = Po !pressão constante na saída do compressor
+           g(n,JJ)= SQRT(((Po)**2.0)-(zeta*JJ)) !assumimos que o último elemento discreto é regime permanente.
+           print*, g(n,JJ)
+        end do
+
+
+        !!!!!!!!!!!!!!!!!!!!!!!!
+        !RESOLVENDO AS MATRIZES!
+        !!!!!!!!!!!!!!!!!!!!!!!!
+
+        do n = 1 , NN !loop
+        do j = 2, JJ-1  ! a,b,c are the coefficients of C-N scheme and d is the right part
+                asup(j) = (a-b)
+                aprin(j) = -2.0-2.0*a
+                ainf(j) = (a+b)
+                bcol(j) = (-a-b)*g(n,j+1)+(2.0+2.0*a)*g(n,j)+(-a+b)*g(n,j-1)
+                !print *, asup(j), aprin(j), ainf(j), bcol(j)
+        end do
+
+        !call Thomas( ainf, aprin, asup, bcol, JJ, g_novo)
+
+        !do j = 1,JJ
+          !   print*, 'oi', asup(j), aprin(j), ainf(j), bcol(j)
+        !end do
+
+        do j = 2,JJ                !combined decomposition and forward substitution
+            w = ainf(j)/aprin(j-1)
+              aprin(j) = aprin(j)-q*asup(j-1)
+              bcol(j) = bcol(j)-q*bcol(j-1)
+        end do
+
+        !back substitution
+           w = bcol(JJ)/aprin(JJ)
+           g_novo(JJ)= w
+           do j = JJ-1,1,-1
+                w = (bcol(j)-asup(j)*bcol(j+1))/aprin(j)
+                g_novo(j)= w
+                print*, g_novo(j)
+           end do
+
+        g(n+1,j)= g_novo(j)
+        end do
+
+        !GRAVANDO OS RESULTADOS
+
+        open(10,file='crank_nicolsan.txt',status='REPLACE')
+        write(10,*)  'ApproximateSolution =[',x(1),g(1,1)
+        do j =1, JJ
+           do n= 1, NN
+                write(10,*) j, n, x(j),g(n,j)
+           end do
+         end do
+
+        close(10)
+        end program ferramentasmatematicas
