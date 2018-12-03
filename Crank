@@ -1,13 +1,13 @@
         program ferramentasmatematicas
         implicit none
-
+        
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         !                                            !
         !     FELIPE FERNANDES TEPEDINO              !
         !     PEDRO LINS DE MOURA MARTINS DA COSTA   !
         !                                            !
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+        
         !PARAMETROS!
         integer, parameter :: JJ = 100  !distance steps
         integer, parameter :: NN = 1800  !time steps
@@ -22,56 +22,55 @@
         real, parameter :: teta = 0.0 !tubulacao horizontal
         real, parameter :: Q = 10.0 !m3/s
         real, parameter :: Po = 7.0
-
+        
         !VARIAVEIS!
         double precision , dimension(JJ) :: x,Vc,Vb,Va,Vd,g_novo
-        double precision , dimension(NN,JJ) :: g
+        double precision , dimension(NN,JJ) :: g, PP
         real :: zeta, S, a, b, dt, dx
         double precision :: beta, alfa
         integer :: i,j, n
-
+        
         dx = TamDuto/JJ
         dt = Ttot/NN
         S = PI*((D/2.0)**2)
-
+        
         alfa = (16.0*f*Q)/((D**3.0)*(c**2.0)*PI)
         beta = (2.0*grav*sin(teta))/(c**2.0) !Vira 0 pois teta = 0
-
+        
         a = dt/(alfa*((dx)**2.0))
         b = a*beta*dx/2.0
         zeta = (f/D)*((2.0*ro*c*Q/S)**2.0)
         
-
         do j = 1, JJ
              x(j) = j*dx
         end do
-
+        
         !CONDICAO INICIAL - Pressao 7 bar no tubo inteiro
         do n=1, NN
            do j = 1, JJ
               g(n,j) = Po
            end do
         end do
-
+        
         !!!!!!!!!!!!!!!!!!!!!!!
         !CONDICOES DE CONTORNO!
         !!!!!!!!!!!!!!!!!!!!!!!
         do n=1, NN-1
            g(n,1) = Po !pressão constante na saida do compressor
            do j = 2, JJ
-              g(n,j)= ((Po)**2.0)-(zeta*x(j)) !assumimos que o último elemento discreto é regime permanente.
+              g(n,j)=((Po)**2.0)-(zeta*x(j)) !assumimos que o último elemento discreto é regime permanente.
            end do
         end do
-
+        
         !Inicio do Loop para resolver o tempo n+1
         do n = 1 , NN-1 !loop
-
+        
         !PREPARANDO AS MATRIZES SO SISTEMA DE EQUACOES
         !Diagoal Superior C
         do j =1, JJ-1
              Vc(j) = (a + b)
         end do
-
+        
         !Diagonal Principal B
         do j =1, JJ
              Vb(j) = (-2.0 * a - 2.0)
@@ -114,17 +113,22 @@
            end do
         end do
 
+        do n =1, NN
+           do j= 1, JJ
+                p (n,j) = SQRT(g(n,j))
+           end do
+        end do
+        
         !GRAVANDO OS RESULTADOS
         Print*, 'Efetuando grava‡Æo'
         open(10,file='crank.txt',status='REPLACE')
         write(10,*)
         do n =1, NN
            do j= 1, JJ
-                write(10,*) n, j, x(j),g(n,j)
+                write(10,*) n, j, x(j), p(n,j)
            end do
-         end do
+        end do
 
         close(10)
-        Print*, 'Pressione qualquer tecla'
 
         end program ferramentasmatematicas
