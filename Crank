@@ -1,0 +1,140 @@
+        program ferramentasmatematicas
+        implicit none
+
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        !                                            !
+        !     FELIPE FERNANDES TEPEDINO              !
+        !     PEDRO LINS DE MOURA MARTINS DA COSTA   !
+        !                                            !
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        !PARAMETROS!
+
+        integer, parameter :: JJ = 100  !distance steps
+        integer, parameter :: NN = 50  !time steps
+        real, parameter :: TamDuto = 200 !m
+        real, parameter :: Ttot = 3600!s
+        real, parameter :: PI = 3.14159265359
+        real, parameter :: grav = 0.6  !m/s
+        real, parameter :: D = 0.29  !m A definir
+        double precision , parameter :: f = 0.003  ! pq?
+        real, parameter :: ro = 0.73 !kg/m3  (temp. 25º)
+        real, parameter :: c = 340.29 !m/s  (temp. 25º)
+        real, parameter :: teta = 0 !tubulação horizontal
+        real, parameter :: Q = 35 !m3/s
+        real, parameter :: Po = 700000.0
+
+        !VARIAVEIS!
+        double precision , dimension(JJ) :: x,Vc,Vb,Va,Vd,g_novo
+        double precision , dimension(NN,JJ) :: g
+        double precision :: zeta, S, a, b, dt
+        double precision :: w
+        double precision :: beta, alfa
+        integer :: i,j, n
+        real:: dx
+
+        dx = TamDuto/JJ
+        dt = Ttot/NN
+        S = PI*((D/2.0)**2)
+
+        alfa = (16.0*f*Q)/((D**3.0)*(c**2.0)*PI)
+        beta = (2.0*grav*sin(teta))/(c**2.0) !Vira 0 pois teta = 0
+
+        a = dt/(alfa*((dx)**2.0))
+        b = a*beta*dx/2.0
+        zeta = (f/D)*((2.0*ro*c*Q/S)**2.0)
+        
+        !CONDIÇÃO INICIAL - Pressao 1 bar no tubo inteiro
+        do j = 1, JJ
+             x(j) = j*dx
+        end do
+
+        do j=1, JJ
+           do n = 1,NN
+           g(n,j) = 100000
+           end do
+        end do
+
+
+        !!!!!!!!!!!!!!!!!!!!!!!
+        !CONDIÇÕES DE CONTORNO!
+        !!!!!!!!!!!!!!!!!!!!!!!
+
+        do n=1, NN
+           g(n,1) = Po !pressão constante na saida do compressor
+           !g(n,JJ)= SQRT(((Po)**2.0)-(zeta*TamDuto)) !assumimos que o último elemento discreto é regime permanente.
+        end do
+
+        !Inicio do Loop para resolver o tempo N+1
+        do n = 1 , NN !loop
+
+        ! PREPARANDO AS MATRIZES SO SISTEMA DE EQUACOES
+        !Diagoal Superior C
+        do j =1, JJ-1
+             Vc(j) = (a + b)
+        end do
+
+        !Diagonal Principal B
+        do j =1, JJ
+             Vb(j) = -2.0 * a - 2.0
+        end do
+
+        !Diagonal Inferior A
+        do j =2, JJ
+             Va(j) = (a - b)
+        end do
+
+        !Matriz D
+        Print*, a
+        Vd(1) = (2.0*a - 2.0)*g(n,j)
+        Print*, Vd(1)
+        Vd(1) = (-a-b)*g(n,j+1)
+        Print*, Vd(1)
+        Vd(1) = (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
+
+        do j = 2, JJ-1  ! a,b,c are the coefficients of C-N scheme and d is the right part
+                Vd(j) = (-a+b)*g(n,j-1) + (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
+        end do
+        Vd(JJ) = (-a+b)*g(n,j-1) + (2.0*a - 2.0)*g(n,j)
+
+        !RESOLVENDO AS MATRIZES DIAGONAIS PELO METODO DE THOMAS!
+
+        !! COEFICIENTES !!
+        !Recalculando o Vetor C (Daigonal Superior)
+        Vc(1) = Vc(1) / Vb(1)
+        do j = 2, JJ-1
+           Vc(j) = Vc(j)/(Vb(j) - (Vc(j-1) * Va(j)))
+        end do
+
+        !Recalculando o Vetor D
+        pRINT*, vd(1), Vb(1)
+        Vd(1) = Vd(1)/Vb(1)
+
+        
+        Print*, j, Va(100), Vb(100), Vc(99)
+        do j = 2, JJ
+           Vd(j) = (Vd(j) - Vd(j-1)*Va(j))/(Vb(j) - (Vc(j-1) * Va(j)))
+           !Print*,j, Vd(j), Va(1000) Vb
+        end do
+
+        !Substituicao de volta
+           g_novo(JJ)= Vd(JJ)
+           print*, g_novo(JJ)
+           do j = JJ-1,1,-1
+                g_novo(j)= Vd(JJ) - (Vc(j)*g_novo(j+1))
+                g(n+1,j)= g_novo(j)
+           end do
+        end do
+
+        !GRAVANDO OS RESULTADOS
+         Print*, 'Efetuando grava‡Æo'
+        open(10,file='crank.txt',status='REPLACE')
+        write(10,*)
+        do j =1, JJ
+           do n= 1, NN
+                write(10,*) j, n, x(j),g(n,j)
+           end do
+         end do
+
+        close(10)
+        end program ferramentasmatematicas
