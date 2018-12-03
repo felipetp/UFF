@@ -48,7 +48,7 @@
         !CONDICAO INICIAL - Pressao 7 bar no tubo inteiro
         do n=1, NN
            do j = 1, JJ
-              g(n,j) = Po
+              g(n,j) = Po**2
            end do
         end do
         
@@ -56,7 +56,7 @@
         !CONDICOES DE CONTORNO!
         !!!!!!!!!!!!!!!!!!!!!!!
         do n=1, NN-1
-           g(n,1) = Po !pressão constante na saida do compressor
+           g(n,1) = Po**2 !pressão constante na saida do compressor
            do j = 2, JJ
               g(n,j)=((Po)**2.0)-(zeta*x(j)) !assumimos que o último elemento discreto é regime permanente.
            end do
@@ -115,7 +115,7 @@
 
         do n =1, NN
            do j= 1, JJ
-                p (n,j) = SQRT(g(n,j))
+                PP (n,j) = SQRT(g(n,j))
            end do
         end do
         
@@ -125,7 +125,7 @@
         write(10,*)
         do n =1, NN
            do j= 1, JJ
-                write(10,*) n, j, x(j), p(n,j)
+                write(10,*) n, j, x(j), PP(n,j)
            end do
         end do
 
