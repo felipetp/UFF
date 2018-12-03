@@ -21,7 +21,7 @@
         real, parameter :: c = 340.29 !m/s  (temp. 25º)
         real, parameter :: teta = 0.0 !tubulacao horizontal
         real, parameter :: Q = 10.0 !m3/s
-        real, parameter :: Po = 500000.0
+        real, parameter :: Po = 7.0
 
         !VARIAVEIS!
         double precision , dimension(JJ) :: x,Vc,Vb,Va,Vd,g_novo
@@ -59,7 +59,7 @@
         do n=1, NN-1
            g(n,1) = Po !pressão constante na saida do compressor
            do j = 2, JJ
-              g(n,j)= SQRT(((Po)**2.0)-(zeta*x(j))) !assumimos que o último elemento discreto é regime permanente.
+              g(n,j)= ((Po)**2.0)-(zeta*x(j)) !assumimos que o último elemento discreto é regime permanente.
            end do
         end do
 
@@ -70,19 +70,16 @@
         !Diagoal Superior C
         do j =1, JJ-1
              Vc(j) = (a + b)
-             !Print *, 'Vc', j ,Vc(j)
         end do
 
         !Diagonal Principal B
         do j =1, JJ
              Vb(j) = (-2.0 * a - 2.0)
-             !Print *, 'Vb', j , Vb(j)
         end do
 
         !Diagonal Inferior A
         do j =2, JJ
              Va(j) = (a - b)
-             !Print *, 'Va', j , Va(j)
         end do
 
         !Matriz D
@@ -90,17 +87,10 @@
         Vd(j) = (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
         do j = 2, JJ-1  ! a,b,c are the coefficients of C-N scheme and d is the right part
                 Vd(j) = (-a+b)*g(n,j-1 )+ (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
-                Print *, 'Vd', j , Vd(j)
-                Vd(j) =  (2.0*a - 2.0)*g(n,j)
-                Print *, Vd(j)
-                Vd(j) =  (-a-b)*g(n,j+1)
-                Print *, Vd(j)
-                Vd(j) = (-a+b)*g(n,j-1)
-                Print *, Vd(j)
         end do
         j= JJ
         Vd(j) = (-a+b)*g(n,j-1) + (2.0*a - 2.0)*g(n,j)
-        read*, j
+
         !RESOLVENDO AS MATRIZES DIAGONAIS PELO METODO DE THOMAS!
         !! COEFICIENTES !!
         !Recalculando o Vetor C (Daigonal Superior)
@@ -136,5 +126,5 @@
 
         close(10)
         Print*, 'Pressione qualquer tecla'
-        Read*, j
+
         end program ferramentasmatematicas
