@@ -1,124 +1,136 @@
         program ferramentasmatematicas
         implicit none
-        
+
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         !                                            !
         !     FELIPE FERNANDES TEPEDINO              !
         !     PEDRO LINS DE MOURA MARTINS DA COSTA   !
         !                                            !
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        
+
         !PARAMETROS!
-        integer, parameter :: JJ = 100  !distance steps
+        integer, parameter :: JJ = 10  !distance steps
         integer, parameter :: NN = 1800  !time steps
         double precision , parameter :: f = 0.003 !fator de friccao
         real, parameter :: TamDuto = 200.0 !m
         real, parameter :: Ttot = 86400.0!s
         real, parameter :: PI = 3.14159
-        real, parameter :: grav = 0.6  !m/s
+        real, parameter :: grav = 9.8  !m/s
         real, parameter :: D = 0.3  !m
-        real, parameter :: ro = 0.73 !kg/m3  (temp. 25º)
-        real, parameter :: c = 340.29 !m/s  (temp. 25º)
+        real, parameter :: ro = 0.73 !kg/m3  em T=25)
+        real, parameter :: c = 340.29 !m/s  (em T=25)
         real, parameter :: teta = 0.0 !tubulacao horizontal
-        real, parameter :: Q = 10.0 !m3/s
-        real, parameter :: Po = 7.0
-        
+        real, parameter :: Q = .28 !m3/s
+        real, parameter :: Po = 700000.0  !N/m2
+
         !VARIAVEIS!
         double precision , dimension(JJ) :: x,Vc,Vb,Va,Vd,g_novo
         double precision , dimension(NN,JJ) :: g, PP
         real :: zeta, S, a, b, dt, dx
         double precision :: beta, alfa
         integer :: i,j, n
-        
+
+        !Limpando aa vari veis
+        g=0
+        PP=0
+
+        !Calculando variaveis
         dx = TamDuto/JJ
         dt = Ttot/NN
         S = PI*((D/2.0)**2)
-        
+
         alfa = (16.0*f*Q)/((D**3.0)*(c**2.0)*PI)
         beta = (2.0*grav*sin(teta))/(c**2.0) !Vira 0 pois teta = 0
-        
+
         a = dt/(alfa*((dx)**2.0))
-        b = a*beta*dx/2.0
+        b = a*beta*dx/2.0      ! 0 pois beta=0
         zeta = (f/D)*((2.0*ro*c*Q/S)**2.0)
         
         do j = 1, JJ
              x(j) = j*dx
         end do
-        
+
         !CONDICAO INICIAL - Pressao 7 bar no tubo inteiro
+        !(transformamos pra N/m2)
         do n=1, NN
            do j = 1, JJ
               g(n,j) = Po**2
            end do
         end do
-        
+
         !!!!!!!!!!!!!!!!!!!!!!!
         !CONDICOES DE CONTORNO!
         !!!!!!!!!!!!!!!!!!!!!!!
         do n=1, NN-1
-           g(n,1) = Po**2 !pressão constante na saida do compressor
+           g(n,1) = Po**2 !pressao constante na saida do compressor
            do j = 2, JJ
-              g(n,j)=((Po)**2.0)-(zeta*x(j)) !assumimos que o último elemento discreto é regime permanente.
+              g(n,j)=((Po)**2.0)-(zeta*x(j))
            end do
         end do
-        
+
         !Inicio do Loop para resolver o tempo n+1
-        do n = 1 , NN-1 !loop
+        do n = 1 , NN-1
         
-        !PREPARANDO AS MATRIZES SO SISTEMA DE EQUACOES
-        !Diagoal Superior C
-        do j =1, JJ-1
-             Vc(j) = (a + b)
-        end do
-        
-        !Diagonal Principal B
-        do j =1, JJ
+           !PREPARANDO AS MATRIZES SO SISTEMA DE EQUACOES
+           !Diagoal Superior C
+           do j =1, JJ-1
+              Vc(j) = (a + b)
+           end do
+
+           !Diagonal Principal B
+           do j =1, JJ
              Vb(j) = (-2.0 * a - 2.0)
-        end do
-
-        !Diagonal Inferior A
-        do j =2, JJ
+           end do
+        
+           !Diagonal Inferior A
+           do j =2, JJ
              Va(j) = (a - b)
-        end do
+           end do
 
-        !Matriz D
-        j=1
-        Vd(j) = (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
-        do j = 2, JJ-1  ! a,b,c are the coefficients of C-N scheme and d is the right part
+           !Matriz D
+           j=1
+           Vd(j) = (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
+           do j = 2, JJ-1
                 Vd(j) = (-a+b)*g(n,j-1 )+ (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
-        end do
-        j= JJ
-        Vd(j) = (-a+b)*g(n,j-1) + (2.0*a - 2.0)*g(n,j)
+                Print*, '  '
+                Print*,(-a+b)*g(n,j-1 )
+                Print*, (2.0*a - 2.0)*g(n,j)
+                Print*,(-a-b)*g(n,j+1)
+                Print*, ' ---------------------------------------'
+           end do
+           j= JJ
+           Vd(j) = (-a+b)*g(n,j-1) + (2.0*a - 2.0)*g(n,j)
 
-        !RESOLVENDO AS MATRIZES DIAGONAIS PELO METODO DE THOMAS!
-        !! COEFICIENTES !!
-        !Recalculando o Vetor C (Daigonal Superior)
-        Vc(1) = Vc(1) / Vb(1)
-        do j = 2, JJ-1
-           Vc(j) = Vc(j)/(Vb(j) - (Vc(j-1) * Va(j)))
-        end do
+           !RESOLVENDO AS MATRIZES DIAGONAIS PELO METODO DE THOMAS!
+           !! COEFICIENTES !!
+           !Recalculando o Vetor C (Daigonal Superior)
+           j=1
+           Vc(j) = Vc(j) / Vb(j)
+           do j = 2, JJ-1
+              Vc(j) = Vc(j)/(Vb(j) - (Vc(j-1) * Va(j)))
+           end do
 
-        !Recalculando o Vetor D
-        Vd(1) = Vd(1)/Vb(1)
-        do j = 2, JJ
-           Vd(j) = (Vd(j) - Vd(j-1)*Va(j))/(Vb(j) - (Vc(j-1) * Va(j)))
-        end do
+           !Recalculando o Vetor D
+           j=1
+           Vd(j) = Vd(j)/Vb(j)
+           do j = 2, JJ
+              Vd(j) = (Vd(j) - Vd(j-1)*Va(j))/(Vb(j) - (Vc(j-1) * Va(j)))
+           end do
 
-        !Substituicao de volta
-           g_novo(JJ)= Vd(JJ)
-
+           !Substituicao reversa
+           j=JJ
+           g(n+1,j) = g_novo(j)
            do j = JJ-1,1,-1
-                g_novo(j)= Vd(JJ) - (Vc(j)*g_novo(j+1))
-                g(n+1,j)= g_novo(j)
+                g(n+1,j)= Vd(j) - (Vc(j)*g(n+1,j+1))
            end do
         end do
 
         do n =1, NN
            do j= 1, JJ
-                PP (n,j) = SQRT(g(n,j))
+                PP (n,j) = SQRT(g(n,j))/100000
            end do
         end do
-        
+
         !GRAVANDO OS RESULTADOS
         Print*, 'Efetuando grava‡Æo'
         open(10,file='crank.txt',status='REPLACE')
