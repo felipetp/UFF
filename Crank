@@ -92,11 +92,6 @@
            Vd(j) = (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
            do j = 2, JJ-1
                 Vd(j) = (-a+b)*g(n,j-1 )+ (2.0*a - 2.0)*g(n,j) + (-a-b)*g(n,j+1)
-                Print*, '  '
-                Print*,(-a+b)*g(n,j-1 )
-                Print*, (2.0*a - 2.0)*g(n,j)
-                Print*,(-a-b)*g(n,j+1)
-                Print*, ' ---------------------------------------'
            end do
            j= JJ
            Vd(j) = (-a+b)*g(n,j-1) + (2.0*a - 2.0)*g(n,j)
